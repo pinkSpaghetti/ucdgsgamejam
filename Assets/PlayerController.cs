@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     public float gravity = -2f;
 
 
-    private Vector3 move;
+    private float move;
     private float moveX;
     private float moveY;
     private bool isPressing = false;
@@ -22,7 +22,10 @@ public class PlayerController : MonoBehaviour
     public Transform groundCheck;
     public float groundDist;
     public LayerMask groundMask;
+    public float roofDist;
+    public Transform ceilingCheck;
     bool isGrounded;
+    bool isBonked;
 
     Vector3 velocity;
 
@@ -56,10 +59,8 @@ public class PlayerController : MonoBehaviour
         isPressing = !isPressing;
         ***/
         // set player x and z input to vector
-        move = new Vector3(moveX, 0, moveY);
+        move = moveX * moveSpeed;
 
-        // move player based on input and move speed
-        cc.Move(new Vector3(moveX, 0, 0));
 
         if (jump)
         {
@@ -69,17 +70,33 @@ public class PlayerController : MonoBehaviour
             if (isGrounded && jump)
             {
                 Debug.Log("jump true");
-                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-                jump = false;
+                //velocity.y = jumpHeight * -2f * gravity;
+                velocity.y = Mathf.Sqrt(jumpHeight * -5f * gravity);
+                //jump = false;
             }
 
             else if (!isGrounded && jump)
             {
                 Debug.Log("jump false");
-                jump = false;
+                //jump = false;
             }
+
+            /*
+            // Check if the player is touching the ceiling
+            isBonked = Physics.CheckSphere(ceilingCheck.position, roofDist, groundMask);
+            if (isBonked && velocity.y > 0 && !isGrounded)
+            {
+                Debug.Log("ceiling hit");
+                velocity.y = velocity.y * -1;
+            }
+            */
+
+            move = moveX * moveSpeed * 0.1f;
+            jump = false;
         }
 
+        // move player based on input and move speed
+        cc.Move(new Vector3(move, 0, 0));
 
         // gravity
         velocity.y += gravity * Time.fixedDeltaTime;
